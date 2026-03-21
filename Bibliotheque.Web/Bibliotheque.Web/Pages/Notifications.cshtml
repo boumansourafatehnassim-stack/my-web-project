@@ -1,0 +1,64 @@
+﻿@page
+@model Bibliotheque.Web.Pages.NotificationsModel
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="card p-4">
+    <h2 class="mb-3">🔔 Notifications</h2>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+
+    @if (Model.Notifications == null || Model.Notifications.Count == 0)
+    {
+        <p>Aucune notification.</p>
+    }
+    else
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th style="width:170px;">Date</th>
+                    <th>Message</th>
+                    <th style="width:110px;">Statut</th>
+                    <th style="width:140px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var n in Model.Notifications)
+                {
+                    <tr>
+                        <td>@n.DateCreation.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@n.Message</td>
+
+                        <td>
+                            @if (n.Lu)
+                            {
+                                <span class="badge bg-secondary">Lu</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Non lu</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (!n.Lu)
+                            {
+                                <form method="post" asp-page-handler="Lu">
+                                    <input type="hidden" name="id" value="@n.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        Marquer lu
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

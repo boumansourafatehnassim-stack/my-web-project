@@ -1,0 +1,107 @@
+﻿@page
+@model Bibliotheque.Web.Pages.InscriptionsModel
+@{
+    ViewData["Title"] = "Demandes d'inscription";
+}
+
+<div class="container py-4">
+    <h3 class="mb-3">Demandes d'inscription (EN_ATTENTE)</h3>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success">@Model.Message</div>
+    }
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="alert alert-info">Aucune demande en attente.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Photo</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Matricule</th>
+                       
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Action</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in Model.Items)
+                    {
+                        <tr>
+
+                            <td>@d.Id</td>
+
+                            <td>
+                                @if (!string.IsNullOrEmpty(d.PhotoPath))
+                                {
+                                    <img src="@d.PhotoPath" width="50" height="50" style="object-fit:cover;border-radius:6px;" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+
+                            <td>@d.Nom</td>
+                            <td>@d.Prenom</td>
+                            <td>@d.Email</td>
+                            <td>@d.Matricule</td>
+
+                            <td>@d.DateDemande</td>
+
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    @d.Statut
+                                </span>
+                            </td>
+
+                            <td>
+                                <form method="post" class="d-inline">
+                                    <input type="hidden" name="DemandeId" value="@d.Id" />
+
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="CreerCarte"
+                                               value="true"
+                                               id="creerCarte_@d.Id" />
+                                        <label class="form-check-label" for="creerCarte_@d.Id">
+                                            Créer carte étudiant
+                                        </label>
+                                    </div>
+
+                                    <button name="Action" value="VALIDER"
+                                            class="btn btn-success btn-sm">
+                                        Valider
+                                    </button>
+
+                                    <button name="Action" value="REFUSER"
+                                            class="btn btn-danger btn-sm">
+                                        Refuser
+                                    </button>
+                                </form>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

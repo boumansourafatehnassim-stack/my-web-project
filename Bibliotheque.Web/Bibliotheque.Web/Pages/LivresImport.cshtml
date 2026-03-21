@@ -1,0 +1,29 @@
+﻿@page
+@model Bibliotheque.Web.Pages.LivresImportModel
+@{
+    ViewData["Title"] = "Importer Excel";
+}
+
+<div class="card p-4">
+    <h3 class="mb-3">Importer des livres depuis Excel</h3>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success">@Model.Message</div>
+    }
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="form-label">Fichier Excel</label>
+            <input asp-for="File" type="file" class="form-control" accept=".xlsx,.xls" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Importer</button>
+        <a asp-page="/Livres" class="btn btn-secondary">Retour</a>
+    </form>
+</div>

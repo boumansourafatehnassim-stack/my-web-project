@@ -1,0 +1,145 @@
+﻿@page
+@model Bibliotheque.Web.Pages.AttestationModel
+@{
+    ViewData["Title"] = "Quitus de bibliothèque";
+}
+
+<div class="page-section no-print">
+    <div class="dashboard-hero">
+        <h2 class="mb-1">Attestation de quitus</h2>
+        <p class="mb-0 text-white">Recherche d'un étudiant et génération de l'attestation de bibliothèque.</p>
+    </div>
+</div>
+
+<div class="content-panel page-section no-print">
+    <form method="get" class="row g-2">
+        <div class="col-md-8">
+            <input type="text"
+                   name="Search"
+                   value="@Model.Search"
+                   class="form-control"
+                   placeholder="Saisir le matricule ou l'email de l'étudiant" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        </div>
+        <div class="col-auto">
+            <a asp-page="/Attestation" class="btn btn-outline-secondary">Réinitialiser</a>
+        </div>
+    </form>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="alert alert-danger no-print">@Model.Error</div>
+}
+
+@if (Model.Result != null)
+{
+    <div class="content-panel page-section no-print">
+        <h4 class="mb-3">Informations de l'étudiant</h4>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <strong>Nom :</strong> @Model.Result.Nom
+            </div>
+            <div class="col-md-6">
+                <strong>Prénom :</strong> @Model.Result.Prenom
+            </div>
+            <div class="col-md-6">
+                <strong>Email :</strong> @Model.Result.Email
+            </div>
+            <div class="col-md-6">
+                <strong>Matricule :</strong> @Model.Result.Matricule
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Result.CanGenerate)
+    {
+        <div class="content-panel page-section no-print">
+            <button type="button" class="btn btn-success" onclick="window.print()">
+                Imprimer l'attestation
+            </button>
+
+        </div>
+
+        <div id="printableAttestation" class="attestation-sheet">
+            <div class="attestation-header text-center">
+                <h6>République Algérienne Démocratique et Populaire</h6>
+                <h6>Ministère de l’Enseignement Supérieur et de la Recherche Scientifique</h6>
+                <h5 class="fw-bold">École Nationale Supérieure des Technologies de l’Information et de la Communication</h5>
+                <h5 class="fw-bold">ENSTICP</h5>
+            </div>
+
+            <div class="text-center my-4">
+                <h3 class="fw-bold text-decoration-underline">ATTESTATION DE QUITUS DE BIBLIOTHÈQUE</h3>
+            </div>
+
+            <div class="attestation-body">
+                <p>Je soussigné(e), bibliothécaire de l’ENSTICP, atteste que :</p>
+
+                <p><strong>Nom :</strong> @Model.Result.Nom</p>
+                <p><strong>Prénom :</strong> @Model.Result.Prenom</p>
+                <p><strong>Email :</strong> @Model.Result.Email</p>
+                <p><strong>Matricule :</strong> @Model.Result.Matricule</p>
+
+                <p class="mt-4">
+                    est en situation régulière vis-à-vis de la bibliothèque et ne détient actuellement
+                    aucun ouvrage non restitué.
+                </p>
+
+                <p>
+                    La présente attestation est délivrée à l’intéressé(e) pour servir et valoir ce que de droit.
+                </p>
+            </div>
+
+            <div class="mt-5 d-flex justify-content-between">
+                <div>
+                    <p><strong>Fait à l’ENSTICP, le :</strong> @DateTime.Now.ToString("dd/MM/yyyy")</p>
+                </div>
+
+                <div class="text-center">
+                    <p><strong>Le bibliothécaire</strong></p>
+                    <br /><br />
+                    <p>Signature et cachet</p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            Impossible de générer l’attestation. Cet étudiant possède encore
+            <strong>@Model.Result.EmpruntsEnCoursCount</strong> emprunt(s) non restitué(s).
+        </div>
+
+        <div class="table-wrap page-section">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Livre</th>
+                            <th>Code-barres</th>
+                            <th>Date emprunt</th>
+                            <th>Date retour prévue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in Model.Result.EmpruntsEnCours)
+                        {
+                            <tr>
+                                <td>@e.Id</td>
+                                <td>@e.LivreTitre</td>
+                                <td>@e.CodeBarres</td>
+                                <td>@e.DateEmprunt.ToString("yyyy-MM-dd")</td>
+                                <td>@e.DateRetourPrevue.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}

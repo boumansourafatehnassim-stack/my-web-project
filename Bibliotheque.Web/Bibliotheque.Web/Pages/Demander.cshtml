@@ -1,0 +1,39 @@
+﻿@page
+@using Microsoft.AspNetCore.Http
+@model Bibliotheque.Web.Pages.DemanderModel
+@{
+    ViewData["Title"] = "Demande d'emprunt";
+}
+
+<div class="card p-4">
+    <h3 class="mb-3">Demande d'emprunt</h3>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success">@Model.Message</div>
+    }
+
+    <div class="mb-3">
+        <strong>Utilisateur:</strong> @Model.Email <br />
+        <strong>Rôle:</strong> @Model.Role <br />
+        <strong>Date demande:</strong> @Model.DateDemande.ToString("yyyy-MM-dd") <br />
+        <strong>Date retour prévue:</strong> @Model.DateRetourPrevue.ToString("yyyy-MM-dd") <br />
+        <strong>Statut:</strong> <span class="badge bg-warning text-dark">EN_ATTENTE</span>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="LivreId" />
+
+        <div class="mb-3">
+            <label class="form-label">Commentaire (optionnel)</label>
+            <input asp-for="Commentaire" class="form-control" />
+        </div>
+
+        <button class="btn btn-primary">Confirmer la demande</button>
+        <a class="btn btn-outline-secondary" asp-page="/Livres">Annuler</a>
+    </form>
+</div>

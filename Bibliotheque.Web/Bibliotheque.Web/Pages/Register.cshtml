@@ -1,0 +1,65 @@
+﻿@page
+@model Bibliotheque.Web.Pages.RegisterModel
+@{
+    ViewData["Title"] = "Créer un compte";
+}
+
+<div class="auth-card">
+    <h2 class="mb-2">Créer un compte</h2>
+    <p class="mb-4">Inscription étudiant</p>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success">@Model.Message</div>
+    }
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="form-label">Nom</label>
+            <input asp-for="Nom" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Prénom</label>
+            <input asp-for="Prenom" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Matricule</label>
+            <input asp-for="Matricule" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Rôle</label>
+            <select asp-for="Role" class="form-select">
+                <option value="ETUDIANT">ETUDIANT</option>
+                <option value="EMPLOYE">EMPLOYE</option>
+                <option value="ENSEIGNANT">ENSEIGNANT</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Photo (optionnelle)</label>
+            <input asp-for="Photo" type="file" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" />
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Mot de passe</label>
+            <input asp-for="MotDePasse" type="password" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+            S'inscrire
+        </button>
+    </form>
+</div>

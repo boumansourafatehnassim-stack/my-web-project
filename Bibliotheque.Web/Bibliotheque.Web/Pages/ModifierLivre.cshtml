@@ -1,0 +1,39 @@
+﻿@page "{id:int}"
+@model Bibliotheque.Web.Pages.ModifierLivreModel
+@{
+    ViewData["Title"] = "Modifier Livre";
+}
+
+<div class="card p-4">
+    <h2 class="mb-3">✏ Modifier Livre</h2>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Titre</label>
+            <input class="form-control" asp-for="Titre" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Auteur</label>
+            <input class="form-control" asp-for="Auteur" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Thème</label>
+            <input class="form-control" asp-for="Theme" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Année</label>
+            <input class="form-control" asp-for="AnneePublication" type="number" />
+        </div>
+
+        <button class="btn btn-primary" type="submit">Enregistrer</button>
+        <a class="btn btn-outline-secondary" asp-page="/Livres">Annuler</a>
+    </form>
+</div>

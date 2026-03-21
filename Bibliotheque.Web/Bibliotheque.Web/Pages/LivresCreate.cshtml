@@ -1,0 +1,49 @@
+﻿@page
+@model Bibliotheque.Web.Pages.LivresCreateModel
+@{
+    ViewData["Title"] = "Ajouter un livre";
+}
+
+<div class="card p-4">
+    <h3 class="mb-3">Ajouter un livre</h3>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success">@Model.Message</div>
+    }
+
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Titre</label>
+            <input asp-for="Titre" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Auteur</label>
+            <input asp-for="Auteur" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Thème</label>
+            <input asp-for="Theme" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Année de publication</label>
+            <input asp-for="AnneePublication" class="form-control" type="number" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nombre d'exemplaires</label>
+            <input asp-for="NombreExemplaires" class="form-control" type="number" min="1" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <a asp-page="/Livres" class="btn btn-secondary">Retour</a>
+    </form>
+</div>

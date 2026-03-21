@@ -1,0 +1,100 @@
+﻿@page
+@model Bibliotheque.Web.Pages.DemandesModel
+@{
+    ViewData["Title"] = "Demandes";
+}
+
+<div class="card p-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h2 class="mb-0">📥 Demandes (EN_ATTENTE)</h2>
+            <div class="text-muted">واجهة المكتبي لمعالجة طلبات الإعارة</div>
+        </div>
+        <span class="badge bg-primary">@Model.Demandes.Count</span>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.Info))
+    {
+        <div class="alert alert-success">@Model.Info</div>
+    }
+
+    @if (Model.Demandes.Count == 0)
+    {
+        <div class="alert alert-info mb-0">Aucune demande en attente.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Photo</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Matricule</th>
+                        <th>Livre</th>
+                        <th>Date</th>
+                        <th>Commentaire</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in Model.Demandes)
+                    {
+                        <tr>
+
+                            <td>@d.Id</td>
+
+                            <td>
+                                @if (!string.IsNullOrEmpty(d.PhotoPath))
+                                {
+                                    <img src="@d.PhotoPath" width="50" height="50"
+                                         style="object-fit:cover;border-radius:6px;" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+
+                            <td>@d.Nom</td>
+                            <td>@d.Prenom</td>
+                            <td>@d.Matricule</td>
+                            <td>@d.LivreTitre</td>
+
+                            <td>@d.DateDemande.ToString("yyyy-MM-dd HH:mm")</td>
+
+                            <td>@(string.IsNullOrWhiteSpace(d.Commentaire) ? "-" : d.Commentaire)</td>
+
+                            <td>
+                                <form method="post" asp-page-handler="Traiter" class="d-inline">
+                                    <input type="hidden" name="demandeId" value="@d.Id" />
+                                    <input type="hidden" name="action" value="VALIDER" />
+
+                                    <button class="btn btn-sm btn-success">
+                                        ✅ Valider
+                                    </button>
+                                </form>
+
+                                <form method="post" asp-page-handler="Traiter" class="d-inline ms-1">
+                                    <input type="hidden" name="demandeId" value="@d.Id" />
+                                    <input type="hidden" name="action" value="REFUSER" />
+
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        ❌ Refuser
+                                    </button>
+                                </form>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

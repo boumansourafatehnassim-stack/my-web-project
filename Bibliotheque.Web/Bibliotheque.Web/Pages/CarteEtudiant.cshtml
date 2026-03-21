@@ -1,0 +1,321 @@
+﻿@page "{id?}"
+@model Bibliotheque.Web.Pages.CarteEtudiantModel
+@{
+    ViewData["Title"] = "Carte Bibliothèque";
+}
+
+<div class="container py-4">
+    <h3 class="mb-4 text-center">Carte Bibliothèque</h3>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+    else if (Model.Carte != null)
+    {
+        <div class="card-actions no-print">
+            @if (!Model.Carte.CarteImprimee)
+            {
+                <button type="button" class="btn btn-primary" onclick="imprimerCarte(@Model.Carte.Id)">
+                    Imprimer la carte
+                </button>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+                    Cette carte a déjà été imprimée le
+                    @(Model.Carte.DateImpressionCarte?.ToString("dd/MM/yyyy HH:mm") ?? "—")
+                </div>
+            }
+        </div>
+
+        <div id="carteBibliotheque" class="biblio-card">
+            <div class="card-header-custom">
+                <div class="institution-block">
+                    <div class="institution-name">ENSTICP</div>
+                    <div class="library-title">CARTE BIBLIOTHÈQUE</div>
+                </div>
+
+                <div class="card-mini-badge">Valide</div>
+            </div>
+
+            <div class="card-main">
+                <div class="photo-side">
+                    @if (!string.IsNullOrEmpty(Model.Carte.PhotoPath))
+                    {
+                        <img src="@Model.Carte.PhotoPath" alt="Photo" class="student-photo" />
+                    }
+                    else
+                    {
+                        <div class="photo-placeholder">
+                            Photo
+                        </div>
+                    }
+                </div>
+
+                <div class="info-side">
+                    <div class="info-row">
+                        <span class="info-label">Nom</span>
+                        <span class="info-value">@Model.Carte.Nom</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Prénom</span>
+                        <span class="info-value">@Model.Carte.Prenom</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Matricule</span>
+                        <span class="info-value">@Model.Carte.Matricule</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Email</span>
+                        <span class="info-value email-value">@Model.Carte.Email</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Naissance</span>
+                        <span class="info-value">@(Model.Carte.DateNaissance?.ToString("dd/MM/yyyy") ?? "—")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer-custom">
+                <div class="footer-item">
+                    <span class="footer-label">Création</span>
+                    <span class="footer-value">@(Model.Carte.DateCreationCarte?.ToString("dd/MM/yyyy") ?? "—")</span>
+                </div>
+
+                <div class="footer-item">
+                    <span class="footer-label">Expiration</span>
+                    <span class="footer-value">@(Model.Carte.DateExpirationCarte?.ToString("dd/MM/yyyy") ?? "—")</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .card-actions {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .biblio-card {
+        width: 85.6mm;
+        height: 54mm;
+        margin: 0 auto;
+        border-radius: 16px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #eef7ff 0%, #d9eeff 55%, #c7e4ff 100%);
+        border: 1px solid #9ecdf5;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-family: Arial, sans-serif;
+        color: #111;
+    }
+
+    .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid rgba(13, 110, 253, 0.22);
+        padding-bottom: 6px;
+    }
+
+    .institution-block {
+        min-width: 0;
+    }
+
+    .institution-name {
+        font-size: 10px;
+        font-weight: 700;
+        color: #111;
+        line-height: 1.2;
+        text-transform: uppercase;
+    }
+
+    .library-title {
+        font-size: 13px;
+        font-weight: 800;
+        color: #0b5ed7;
+        margin-top: 2px;
+        letter-spacing: 0.6px;
+    }
+
+    .card-mini-badge {
+        background: #ffffff;
+        color: #0b5ed7;
+        border: 1px solid #9ecdf5;
+        border-radius: 999px;
+        padding: 4px 8px;
+        font-size: 8px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .card-main {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex: 1;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+
+    .photo-side {
+        width: 23mm;
+        min-width: 23mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .student-photo,
+    .photo-placeholder {
+        width: 22mm;
+        height: 26mm;
+        border-radius: 10px;
+        object-fit: cover;
+        background: #ffffff;
+        border: 1px solid #9ecdf5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        font-size: 9px;
+        font-weight: 600;
+    }
+
+    .info-side {
+        flex: 1;
+        min-width: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 8px;
+    }
+
+    .info-row {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .info-label {
+        font-size: 7px;
+        font-weight: 700;
+        color: #444;
+        text-transform: uppercase;
+        margin-bottom: 1px;
+    }
+
+    .info-value {
+        font-size: 9px;
+        font-weight: 700;
+        color: #111;
+        line-height: 1.2;
+        word-break: break-word;
+    }
+
+    .email-value {
+        font-size: 8px;
+    }
+
+    .card-footer-custom {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        border-top: 1px solid rgba(13, 110, 253, 0.22);
+        padding-top: 6px;
+    }
+
+    .footer-item {
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid #b7daf8;
+        border-radius: 10px;
+        padding: 4px 6px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .footer-label {
+        font-size: 7px;
+        font-weight: 700;
+        color: #444;
+        text-transform: uppercase;
+    }
+
+    .footer-value {
+        font-size: 8.5px;
+        font-weight: 700;
+        color: #111;
+        margin-top: 1px;
+    }
+
+    @@media print {
+        @@page {
+            size: 85.6mm 54mm;
+            margin: 0;
+        }
+
+        html, body {
+            width: 85.6mm;
+            height: 54mm;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden;
+            background: white;
+        }
+
+        body * {
+            visibility: hidden;
+        }
+
+        #carteBibliotheque,
+        #carteBibliotheque * {
+            visibility: visible;
+        }
+
+        #carteBibliotheque {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 85.6mm;
+            height: 54mm;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+
+<script>
+    async function imprimerCarte(userId) {
+        if (!confirm("vous peuvet imprimer une seul foit  ")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/CarteEtudiant?handler=MarquerImpression&id=${userId}`, {
+                method: 'POST'
+            });
+
+            const text = await response.text();
+
+           
+
+            window.print();
+            setTimeout(() => location.reload(), 500);
+        } catch {
+            alert("Impossible d'enregistrer l'impression.");
+        }
+    }
+</script>

@@ -1,0 +1,77 @@
+﻿@page
+@model Bibliotheque.Web.Pages.RetoursModel
+@{
+    ViewData["Title"] = "Retours";
+}
+
+<div class="card p-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h2 class="mb-0">↩️ Enregistrer un retour</h2>
+            <div class="text-muted">Gestion des retours (Bibliothécaire)</div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-danger">@Model.Error</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success">@Model.Message</div>
+    }
+
+    <form method="get" class="row g-2 align-items-end mb-3">
+        <div class="col-md-3">
+            <label class="form-label">UserId (Étudiant)</label>
+            <input class="form-control" type="number" name="userId" value="@(Model.UserId?.ToString() ?? "")" min="1" />
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary">Afficher emprunts en cours</button>
+        </div>
+    </form>
+
+    @if (Model.UserId == null)
+    {
+        <div class="text-muted">Entrez un UserId ثم اضغط Afficher.</div>
+    }
+    else if (Model.Emprunts.Count == 0)
+    {
+        <div class="alert alert-info">Aucun emprunt en cours pour cet utilisateur.</div>
+    }
+    else
+    {
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th style="width:90px;">Id</th>
+                    <th style="width:120px;">ExemplaireId</th>
+                    <th style="width:190px;">Date emprunt</th>
+                    <th style="width:190px;">Retour prévu</th>
+                    <th style="width:140px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model.Emprunts)
+                {
+                    <tr>
+                        <td>@e.Id</td>
+                        <td>@e.ExemplaireId</td>
+                        <td>@e.DateEmprunt.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@(e.DateRetourPrevue?.ToString("yyyy-MM-dd") ?? "-")</td>
+                        <td>
+                            <form method="post" asp-page-handler="Retour" style="display:inline;">
+                                <input type="hidden" name="empruntId" value="@e.Id" />
+                                <input type="hidden" name="userId" value="@(Model.UserId ?? 0)" />
+                                <button class="btn btn-sm btn-outline-success"
+                                        onclick="return confirm('Confirmer le retour ?');">
+                                    Retour
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

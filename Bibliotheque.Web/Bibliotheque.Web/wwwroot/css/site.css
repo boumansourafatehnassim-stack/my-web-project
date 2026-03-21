@@ -1,0 +1,127 @@
+﻿html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+
+}
+:root {
+    --primary: #1e40af; /* أزرق غامق */
+    --primary2: #2563eb; /* أزرق */
+    --bg: #f3f6fb; /* خلفية فاتحة */
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+.navbar {
+    background: linear-gradient(90deg, var(--primary), var(--primary2)) !important;
+}
+
+    .navbar .navbar-brand,
+    .navbar .nav-link {
+        color: #fff !important;
+        font-weight: 600;
+    }
+
+        .navbar .nav-link:hover {
+            opacity: .9;
+            text-decoration: underline;
+        }
+
+.page-shell {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 12px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(15,23,42,.12);
+    overflow: hidden;
+}
+
+.auth-head {
+    padding: 20px 22px;
+    background: linear-gradient(90deg, rgba(30,64,175,.12), rgba(37,99,235,.12));
+    border-bottom: 1px solid rgba(15,23,42,.06);
+}
+
+.auth-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.auth-sub {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.auth-body {
+    padding: 22px;
+}
+
+.form-control {
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.btn-primary {
+    background: var(--primary2);
+    border-color: var(--primary2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-weight: 700;
+}
+
+    .btn-primary:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+
+.alert {
+    border-radius: 12px;
+}
+body {
+    background: #f3f6fb;
+}
+
+main {
+    min-height: calc(100vh - 150px);
+}
+
+.table {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(15,23,42,.06);
+}
