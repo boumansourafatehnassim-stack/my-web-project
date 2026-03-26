@@ -7,7 +7,7 @@
         "Action": "Start"
       },
       {
-        "Path": "..\\Bibliotheque.Web\\Bibliotheque.Web\\Bibliotheque.Web.csproj",
+        "Path": "Bibliotheque.Web\\Bibliotheque.Web\\Bibliotheque.Web.csproj",
         "Action": "Start"
       }
     ]

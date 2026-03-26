@@ -16,7 +16,7 @@ namespace Bibliotheque.Web.Pages
         }
 
         [BindProperty]
-        public IFormFile? File { get; set; }
+        public IFormFile? UploadFile { get; set; }
 
         public string? Message { get; set; }
         public string? Error { get; set; }
@@ -41,7 +41,7 @@ namespace Bibliotheque.Web.Pages
             if (role != "BIBLIOTHECAIRE" && role != "ADMIN")
                 return RedirectToPage("/Livres");
 
-            if (File == null || File.Length == 0)
+            if (UploadFile == null || UploadFile.Length == 0)
             {
                 Error = "Choisissez un fichier Excel.";
                 return Page();
@@ -53,11 +53,17 @@ namespace Bibliotheque.Web.Pages
                 new AuthenticationHeaderValue("Bearer", jwt);
 
             using var form = new MultipartFormDataContent();
-            using var stream = File.OpenReadStream();
-            var fileContent = new StreamContent(stream);
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue(File.ContentType);
+            using var stream = UploadFile.OpenReadStream();
+            using var fileContent = new StreamContent(stream);
 
-            form.Add(fileContent, "File", File.FileName);
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue(
+                    string.IsNullOrWhiteSpace(UploadFile.ContentType)
+                        ? "application/octet-stream"
+                        : UploadFile.ContentType
+                );
+
+            form.Add(fileContent, "file", UploadFile.FileName);
 
             var resp = await client.PostAsync($"{apiBase}/api/Livres/import", form);
 
@@ -68,6 +74,7 @@ namespace Bibliotheque.Web.Pages
                 return Page();
             }
 
+            Message = "Importation réussie.";
             return RedirectToPage("/Livres");
         }
     }

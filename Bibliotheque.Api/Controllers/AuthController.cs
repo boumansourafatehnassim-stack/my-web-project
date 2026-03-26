@@ -59,11 +59,18 @@ namespace Bibliotheque.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterDto dto)
         {
+
             var exists = await _db.Users.AnyAsync(u =>
     u.Email.ToLower().Trim() == dto.Email.ToLower().Trim()
 );
             if (exists)
                 return BadRequest(new { error = "Email déjà utilisé" });
+            var matriculeExists = await _db.Users.AnyAsync(u =>
+    u.Matricule == dto.Matricule
+);
+
+            if (matriculeExists)
+                return BadRequest(new { error = "Matricule déjà utilisé" });
 
             var role = string.IsNullOrWhiteSpace(dto.Role)
                 ? "ETUDIANT"
@@ -92,6 +99,7 @@ namespace Bibliotheque.Api.Controllers
 
                 photoPath = $"/uploads/users/{fileName}";
             }
+
 
             var user = new User
             {

@@ -22,22 +22,22 @@
     }
 
     <form method="get" class="row g-2 align-items-end mb-3">
-        <div class="col-md-3">
-            <label class="form-label">UserId (Étudiant)</label>
-            <input class="form-control" type="number" name="userId" value="@(Model.UserId?.ToString() ?? "")" min="1" />
+        <div class="col-md-4">
+            <label class="form-label">Matricule (Étudiant)</label>
+            <input class="form-control" type="text" name="matricule" value="@(Model.Matricule ?? "")" placeholder="Ex: 20231234" />
         </div>
         <div class="col-md-3">
             <button class="btn btn-primary">Afficher emprunts en cours</button>
         </div>
     </form>
 
-    @if (Model.UserId == null)
+    @if (string.IsNullOrWhiteSpace(Model.Matricule))
     {
-        <div class="text-muted">Entrez un UserId ثم اضغط Afficher.</div>
+        <div class="text-muted">Entrez un matricule ثم اضغط Afficher.</div>
     }
     else if (Model.Emprunts.Count == 0)
     {
-        <div class="alert alert-info">Aucun emprunt en cours pour cet utilisateur.</div>
+        <div class="alert alert-info">Aucun emprunt en cours pour cet étudiant.</div>
     }
     else
     {
@@ -62,7 +62,7 @@
                         <td>
                             <form method="post" asp-page-handler="Retour" style="display:inline;">
                                 <input type="hidden" name="empruntId" value="@e.Id" />
-                                <input type="hidden" name="userId" value="@(Model.UserId ?? 0)" />
+                                <input type="hidden" name="matricule" value="@(Model.Matricule ?? "")" />
                                 <button class="btn btn-sm btn-outline-success"
                                         onclick="return confirm('Confirmer le retour ?');">
                                     Retour

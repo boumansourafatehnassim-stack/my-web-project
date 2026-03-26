@@ -18,7 +18,7 @@ namespace Bibliotheque.Web.Pages
         }
 
         [BindProperty(SupportsGet = true)]
-        public int? UserId { get; set; }
+        public string? Matricule { get; set; }
 
         public string? Error { get; set; }
         public string? Message { get; set; }
@@ -35,7 +35,14 @@ namespace Bibliotheque.Web.Pages
             public DateTime? DateRetourReelle { get; set; }
         }
 
-        // ✅ Handler واحد فقط للـGET
+        public class UserLookupDto
+        {
+            public int Id { get; set; }
+            public string Nom { get; set; } = "";
+            public string Prenom { get; set; } = "";
+            public string? Matricule { get; set; }
+        }
+
         public async Task<IActionResult> OnGetAsync()
         {
             var role = HttpContext.Session.GetString("role");
@@ -46,8 +53,7 @@ namespace Bibliotheque.Web.Pages
             if (string.IsNullOrEmpty(jwt))
                 return RedirectToPage("/Login");
 
-            // إذا ما دخلش UserId نعرض الصفحة فقط
-            if (UserId == null || UserId <= 0)
+            if (string.IsNullOrWhiteSpace(Matricule))
             {
                 Emprunts = new();
                 return Page();
@@ -57,7 +63,29 @@ namespace Bibliotheque.Web.Pages
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
-            var resp = await client.GetAsync($"{apiBase}/api/Emprunts/user/{UserId}/en-cours");
+            // 1) نلقاو user انطلاقًا من matricule
+            var userResp = await client.GetAsync($"{apiBase}/api/Users/by-matricule/{Uri.EscapeDataString(Matricule.Trim())}");
+            var userBody = await userResp.Content.ReadAsStringAsync();
+
+            if (!userResp.IsSuccessStatusCode)
+            {
+                Error = "Aucun étudiant trouvé avec ce matricule.";
+                Emprunts = new();
+                return Page();
+            }
+
+            var user = JsonSerializer.Deserialize<UserLookupDto>(userBody,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (user == null || user.Id <= 0)
+            {
+                Error = "Aucun étudiant trouvé avec ce matricule.";
+                Emprunts = new();
+                return Page();
+            }
+
+            // 2) نجيبو emprunts en cours تاعو بالـ userId
+            var resp = await client.GetAsync($"{apiBase}/api/Emprunts/user/{user.Id}/en-cours");
             var body = await resp.Content.ReadAsStringAsync();
 
             if (!resp.IsSuccessStatusCode)
@@ -73,7 +101,7 @@ namespace Bibliotheque.Web.Pages
             return Page();
         }
 
-        public async Task<IActionResult> OnPostRetourAsync(int empruntId, int userId)
+        public async Task<IActionResult> OnPostRetourAsync(int empruntId, string matricule)
         {
             var role = HttpContext.Session.GetString("role");
             if (role != "BIBLIOTHECAIRE")
@@ -96,13 +124,12 @@ namespace Bibliotheque.Web.Pages
             if (!resp.IsSuccessStatusCode)
             {
                 Error = $"Erreur retour: {body}";
-                // نرجع نفس الصفحة ونعاود نجبدو emprunts
-                UserId = userId;
+                Matricule = matricule;
                 return await OnGetAsync();
             }
 
             Message = "✅ Retour enregistré. Notification envoyée à l'étudiant.";
-            return RedirectToPage(new { userId = userId });
+            return RedirectToPage(new { matricule = matricule });
         }
     }
 }

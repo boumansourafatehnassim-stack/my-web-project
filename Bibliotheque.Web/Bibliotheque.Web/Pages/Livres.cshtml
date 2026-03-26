@@ -37,7 +37,6 @@
             <option value="20">20</option>
             <option value="50">50</option>
             <option value="100">100</option>
-            <option value="1000">1000</option>
         </select>
     </div>
 
@@ -61,7 +60,7 @@
                 <a class="btn btn-outline-success btn-sm" asp-page="/ImporterLivres">Importer Excel</a>
             }
 
-            <span class="badge-soft">@(Model.Livres?.Count ?? 0) livres</span>
+            <span class="badge-soft">@(Model.LivresPaged?.TotalCount ?? 0) livres</span>
         </div>
     </div>
 
@@ -88,56 +87,161 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var l in Model.Livres ?? new())
+                @if (Model.LivresPaged?.Items != null && Model.LivresPaged.Items.Any())
+                {
+                    @foreach (var l in Model.LivresPaged.Items)
+                    {
+                        <tr>
+                            <td>@l.Id</td>
+                            <td>@l.Titre</td>
+                            <td>@l.Auteur</td>
+                            <td>@(string.IsNullOrWhiteSpace(l.AdresseBibliogr) ? "-" : l.AdresseBibliogr)</td>
+                            <td>@l.AnneePublication</td>
+                            <td>@(string.IsNullOrWhiteSpace(l.Langue) ? "-" : l.Langue)</td>
+                            <td>@(string.IsNullOrWhiteSpace(l.Theme) ? "-" : l.Theme)</td>
+                            <td>@l.NombreExemplaires</td>
+                            <td>
+                                @if (l.NombreDisponibles > 0)
+                                {
+                                    <span class="badge bg-success">@l.NombreDisponibles</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">0</span>
+                                }
+                            </td>
+                            <td>
+                                @if (!isAuthenticated)
+                                {
+                                    <a class="btn btn-sm btn-outline-primary" asp-page="/Login">Se connecter</a>
+                                }
+                                else if (canManage)
+                                {
+                                    <a class="btn btn-sm btn-warning me-1" asp-page="/ModifierLivre" asp-route-id="@l.Id">Edit</a>
+
+                                    <form method="post"
+                                          asp-page-handler="Delete"
+                                          asp-route-id="@l.Id"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Confirmer la suppression de ce livre ?');">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-sm btn-primary"
+                                       asp-page="/Demander"
+                                       asp-route-livreId="@l.Id">
+                                        Demander
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@l.Id</td>
-                        <td>@l.Titre</td>
-                        <td>@l.Auteur</td>
-                        <td>@(string.IsNullOrWhiteSpace(l.AdresseBibliogr) ? "-" : l.AdresseBibliogr)</td>
-                        <td>@l.AnneePublication</td>
-                        <td>@(string.IsNullOrWhiteSpace(l.Langue) ? "-" : l.Langue)</td>
-                        <td>@(string.IsNullOrWhiteSpace(l.Theme) ? "-" : l.Theme)</td>
-                        <td>@l.NombreExemplaires</td>
-                        <td>
-                            @if (l.NombreDisponibles > 0)
-                            {
-                                <span class="badge bg-success">@l.NombreDisponibles</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger">0</span>
-                            }
-                        </td>
-                        <td>
-                            @if (!isAuthenticated)
-                            {
-                                <a class="btn btn-sm btn-outline-primary" asp-page="/Login">Se connecter</a>
-                            }
-                            else if (canManage)
-                            {
-                                <a class="btn btn-sm btn-warning me-1" asp-page="/ModifierLivre" asp-route-id="@l.Id">Edit</a>
-
-                                <form method="post"
-                                      asp-page-handler="Delete"
-                                      asp-route-id="@l.Id"
-                                      class="d-inline"
-                                      onsubmit="return confirm('Confirmer la suppression de ce livre ?');">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            }
-                            else
-                            {
-                                <a class="btn btn-sm btn-primary"
-                                   asp-page="/Demander"
-                                   asp-route-livreId="@l.Id">
-                                    Demander
-                                </a>
-                            }
+                        <td colspan="10" class="text-center text-muted py-4">
+                            Aucun livre trouvé.
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
+   @if (Model.LivresPaged != null && Model.LivresPaged.TotalPages > 1)
+{
+    var currentPage = Model.LivresPaged.Page;
+    var totalPages = Model.LivresPaged.TotalPages;
+
+    var startPage = Math.Max(1, currentPage - 2);
+    var endPage = Math.Min(totalPages, currentPage + 2);
+
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center flex-wrap">
+
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-page="/Livres"
+                   asp-route-Search="@Model.Search"
+                   asp-route-Theme="@Model.Theme"
+                   asp-route-PageSize="@Model.PageSize"
+                   asp-route-PageNumber="@(currentPage - 1)">
+                    Précédent
+                </a>
+            </li>
+
+            @if (startPage > 1)
+            {
+                <li class="page-item @(currentPage == 1 ? "active" : "")">
+                    <a class="page-link"
+                       asp-page="/Livres"
+                       asp-route-Search="@Model.Search"
+                       asp-route-Theme="@Model.Theme"
+                       asp-route-PageSize="@Model.PageSize"
+                       asp-route-PageNumber="1">
+                        1
+                    </a>
+                </li>
+
+                @if (startPage > 2)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-page="/Livres"
+                       asp-route-Search="@Model.Search"
+                       asp-route-Theme="@Model.Theme"
+                       asp-route-PageSize="@Model.PageSize"
+                       asp-route-PageNumber="@i">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @if (endPage < totalPages)
+            {
+                @if (endPage < totalPages - 1)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "active" : "")">
+                    <a class="page-link"
+                       asp-page="/Livres"
+                       asp-route-Search="@Model.Search"
+                       asp-route-Theme="@Model.Theme"
+                       asp-route-PageSize="@Model.PageSize"
+                       asp-route-PageNumber="@totalPages">
+                        @totalPages
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-page="/Livres"
+                   asp-route-Search="@Model.Search"
+                   asp-route-Theme="@Model.Theme"
+                   asp-route-PageSize="@Model.PageSize"
+                   asp-route-PageNumber="@(currentPage + 1)">
+                    Suivant
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+}
+    }
 </div>

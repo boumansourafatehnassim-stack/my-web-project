@@ -18,24 +18,30 @@
         <div class="alert alert-success">@Model.Message</div>
     }
 
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
     <form method="post" enctype="multipart/form-data">
         <div class="mb-3">
-            <label class="form-label">Nom</label>
-            <input asp-for="Nom" class="form-control" />
+            <label asp-for="Nom" class="form-label">Nom</label>
+            <input asp-for="Nom" class="form-control" required />
+            <span asp-validation-for="Nom" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Prénom</label>
-            <input asp-for="Prenom" class="form-control" />
+            <label asp-for="Prenom" class="form-label">Prénom</label>
+            <input asp-for="Prenom" class="form-control" required />
+            <span asp-validation-for="Prenom" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Matricule</label>
-            <input asp-for="Matricule" class="form-control" />
+            <label asp-for="Matricule" class="form-label">Matricule</label>
+            <input asp-for="Matricule" class="form-control" required minlength="5" pattern="\d+" />
+            <span asp-validation-for="Matricule" class="text-danger"></span>
+            <small class="text-muted">Le matricule doit contenir au moins 5 chiffres.</small>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Rôle</label>
+            <label asp-for="Role" class="form-label">Rôle</label>
             <select asp-for="Role" class="form-select">
                 <option value="ETUDIANT">ETUDIANT</option>
                 <option value="EMPLOYE">EMPLOYE</option>
@@ -44,18 +50,21 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Photo (optionnelle)</label>
+            <label asp-for="Photo" class="form-label">Photo (optionnelle)</label>
             <input asp-for="Photo" type="file" class="form-control" />
+            <span asp-validation-for="Photo" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input asp-for="Email" class="form-control" />
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" type="email" class="form-control" required />
+            <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
         <div class="mb-4">
-            <label class="form-label">Mot de passe</label>
-            <input asp-for="MotDePasse" type="password" class="form-control" />
+            <label asp-for="MotDePasse" class="form-label">Mot de passe</label>
+            <input asp-for="MotDePasse" type="password" class="form-control" required />
+            <span asp-validation-for="MotDePasse" class="text-danger"></span>
         </div>
 
         <button type="submit" class="btn btn-primary w-100">
@@ -63,3 +72,7 @@
         </button>
     </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

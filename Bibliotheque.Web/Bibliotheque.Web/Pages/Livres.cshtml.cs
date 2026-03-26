@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
+using Bibliotheque.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -16,7 +17,7 @@ namespace Bibliotheque.Web.Pages
             _config = config;
         }
 
-        public List<LivreDto> Livres { get; set; } = new();
+        public PagedResult<LivreDto> LivresPaged { get; set; } = new();
         public string? Error { get; set; }
 
         [BindProperty(SupportsGet = true)]
@@ -26,12 +27,10 @@ namespace Bibliotheque.Web.Pages
         public string? Theme { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public int Page { get; set; } = 1;
+        public int PageNumber { get; set; } = 1;
 
         [BindProperty(SupportsGet = true)]
-        public int PageSize { get; set; } = 1000;
-
-        public int Total { get; set; }
+        public int PageSize { get; set; } = 20;
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -44,10 +43,10 @@ namespace Bibliotheque.Web.Pages
                 if (!string.IsNullOrEmpty(jwt))
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
-                var url = $"{apiBase}/api/Livres?page={Page}&pageSize={PageSize}";
+                var url = $"{apiBase}/api/Livres?page={PageNumber}&pageSize={PageSize}";
 
                 if (!string.IsNullOrWhiteSpace(Search))
-                    url += $"&search={Uri.EscapeDataString(Search.Trim())}";
+                    url += $"&recherche={Uri.EscapeDataString(Search.Trim())}";
 
                 if (!string.IsNullOrWhiteSpace(Theme))
                     url += $"&theme={Uri.EscapeDataString(Theme.Trim())}";
@@ -66,29 +65,7 @@ namespace Bibliotheque.Web.Pages
                     PropertyNameCaseInsensitive = true
                 };
 
-                using var doc = JsonDocument.Parse(json);
-
-                // ✅ إذا API يرجع Object فيه items
-                if (doc.RootElement.ValueKind == JsonValueKind.Object)
-                {
-                    if (doc.RootElement.TryGetProperty("items", out var itemsEl) ||
-                        doc.RootElement.TryGetProperty("Items", out itemsEl))
-                    {
-                        Livres = JsonSerializer.Deserialize<List<LivreDto>>(itemsEl.GetRawText(), options) ?? new();
-
-                        if (doc.RootElement.TryGetProperty("total", out var totalEl) ||
-                            doc.RootElement.TryGetProperty("Total", out totalEl))
-                        {
-                            Total = totalEl.GetInt32();
-                        }
-
-                        return Page();
-                    }
-                }
-
-                // ✅ إذا API يرجع Array مباشرة
-                Livres = JsonSerializer.Deserialize<List<LivreDto>>(json, options) ?? new();
-                Total = Livres.Count;
+                LivresPaged = JsonSerializer.Deserialize<PagedResult<LivreDto>>(json, options) ?? new PagedResult<LivreDto>();
 
                 return Page();
             }
@@ -98,6 +75,7 @@ namespace Bibliotheque.Web.Pages
                 return Page();
             }
         }
+
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
             try
@@ -135,17 +113,14 @@ namespace Bibliotheque.Web.Pages
         }
 
         public class LivreDto
-        
         {
             public int Id { get; set; }
             public string Titre { get; set; } = "";
             public string Auteur { get; set; } = "";
             public string? Theme { get; set; }
             public int? AnneePublication { get; set; }
-
             public string? Langue { get; set; }
             public string? AdresseBibliogr { get; set; }
-
             public bool IsDeleted { get; set; }
             public int NombreExemplaires { get; set; }
             public int NombreDisponibles { get; set; }

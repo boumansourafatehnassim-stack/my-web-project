@@ -1,14 +1,16 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
-using Bibliotheque.Api.Data;
+﻿using Bibliotheque.Api.Data;
 using Bibliotheque.Api.Models;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ClosedXML.Excel;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
 
 namespace Bibliotheque.Api.Controllers
 {
@@ -38,50 +40,66 @@ namespace Bibliotheque.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string? search)
+        public async Task<IActionResult> GetLivres(
+     [FromQuery] string? recherche,
+     [FromQuery] string? theme,
+     [FromQuery] int page = 1,
+     [FromQuery] int pageSize = 20)
         {
+            if (page < 1)
+                page = 1;
+
+            if (pageSize < 1)
+                pageSize = 20;
+
+            if (pageSize > 100)
+                pageSize = 100;
+
             var query = _db.Livres
-                .AsNoTracking()
-                .Where(x => !x.IsDeleted);
+                .Where(l => !l.IsDeleted)
+                .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(search))
+            if (!string.IsNullOrWhiteSpace(recherche))
             {
-                search = search.Trim().ToLower();
-
-                query = query.Where(x =>
-                    x.Titre.ToLower().Contains(search) ||
-                    x.Auteur.ToLower().Contains(search) ||
-                    (x.AdresseBibliogr != null && x.AdresseBibliogr.ToLower().Contains(search)) ||
-                    (x.Theme != null && x.Theme.ToLower().Contains(search)) ||
-                    _db.Exemplaires.Any(e =>
-                        e.LivreId == x.Id &&
-                        e.Emplacement != null &&
-                        e.Emplacement.ToLower().Contains(search))
-                );
+                query = query.Where(l =>
+                    l.Titre.Contains(recherche) ||
+                    l.Auteur.Contains(recherche));
             }
 
+            if (!string.IsNullOrWhiteSpace(theme))
+            {
+                query = query.Where(l => l.Theme != null && l.Theme.Contains(theme));
+            }
+
+            var totalCount = await query.CountAsync();
+
             var items = await query
-                .OrderBy(x => x.Id)
-                .Select(x => new LivreListItemDto
+                .OrderBy(l => l.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(l => new LivreListItemDto
                 {
-                    Id = x.Id,
-                    Titre = x.Titre,
-                    Auteur = x.Auteur,
-                    AdresseBibliogr = x.AdresseBibliogr,
-                    AnneePublication = x.AnneePublication,
-                    Langue = x.Langue,
-                    Theme = x.Theme,
-                    Cote = _db.Exemplaires
-                        .Where(e => e.LivreId == x.Id)
-                        .OrderBy(e => e.Id)
-                        .Select(e => e.Emplacement)
-                        .FirstOrDefault(),
-                    NombreExemplaires = _db.Exemplaires.Count(e => e.LivreId == x.Id),
-                    NombreDisponibles = _db.Exemplaires.Count(e => e.LivreId == x.Id && e.Statut == "DISPONIBLE")
+                    Id = l.Id,
+                    Titre = l.Titre,
+                    Auteur = l.Auteur,
+                    AdresseBibliogr = l.AdresseBibliogr,
+                    AnneePublication = l.AnneePublication,
+                    Langue = l.Langue,
+                    Theme = l.Theme,
+                    NombreExemplaires = l.Exemplaires.Count,
+                    NombreDisponibles = l.Exemplaires.Count(e => e.Statut == "DISPONIBLE")
                 })
                 .ToListAsync();
 
-            return Ok(items);
+            var result = new PagedResult<LivreListItemDto>
+            {
+                Items = items,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+            return Ok(result);
         }
 
         [HttpPost("import")]

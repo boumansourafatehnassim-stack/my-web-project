@@ -165,5 +165,34 @@ namespace Bibliotheque.Api.Controllers
 
             return Ok(new { message = "Première impression enregistrée avec succès." });
         }
+        [HttpGet("by-matricule/{matricule}")]
+        public async Task<IActionResult> GetByMatricule(string matricule)
+        {
+            if (string.IsNullOrWhiteSpace(matricule))
+                return BadRequest("Matricule obligatoire.");
+
+            var user = await _db.Users
+                .Where(u => u.Matricule != null && u.Matricule == matricule)
+                .Select(u => new UserLookupDto
+                {
+                    Id = u.Id,
+                    Nom = u.Nom,
+                    Prenom = u.Prenom,
+                    Matricule = u.Matricule
+                })
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+                return NotFound("Aucun utilisateur trouvé avec ce matricule.");
+
+            return Ok(user);
+        }
+        public class UserLookupDto
+        {
+            public int Id { get; set; }
+            public string Nom { get; set; } = "";
+            public string Prenom { get; set; } = "";
+            public string? Matricule { get; set; }
+        }
     }
 }
