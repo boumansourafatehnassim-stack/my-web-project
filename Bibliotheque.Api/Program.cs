@@ -1,27 +1,35 @@
-using Bibliotheque.Api.Data;
+﻿using Bibliotheque.Api.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using Bibliotheque.Api.Services;
-
-
-
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// ================== Services ==================
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpClient();
 
+builder.Services.AddDistributedMemoryCache();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bibliotheque.Api", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Bibliotheque.Api",
+        Version = "v1"
+    });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -30,7 +38,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "????: Bearer {token}"
+        Description = "Entrez: Bearer {token}"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -44,19 +52,18 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
 
+// Database
 builder.Services.AddDbContext<BibliothequeDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddDbContext<SourceBibliothequeDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SourceSqlServerConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
-builder.Services.AddScoped<DataMigrationService>();
-
-
+// JWT
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
 var jwtAudience = builder.Configuration["Jwt:Audience"]!;
@@ -77,22 +84,37 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ================== Middleware ==================
+
+// Swagger (نخليه شغال حتى في الإنتاج مؤقتًا)
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
+// ❌ مهم: نحيو HTTPS في Somee
+// app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
+app.UseRouting();
+
+app.UseSession();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
+// ================== Routing ==================
+
+
+
+
+// API
 app.MapControllers();
+
+// Razor Pages
+app.MapRazorPages();
 
 app.Run();

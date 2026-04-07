@@ -2,8 +2,8 @@
 <!-- https://go.microsoft.com/fwlink/?LinkID=208121. -->
 <Project>
   <PropertyGroup>
-    <_PublishTargetUrl>C:\Users\j\source\repos\Bibliotheque.Api\Bibliotheque.Api\bin\Release\net8.0\publish\</_PublishTargetUrl>
-    <History>True|2026-03-10T17:39:24.1909275Z||;</History>
+    <_PublishTargetUrl>C:\Users\j\my-web-project\Bibliotheque.Api\bin\Release\net8.0\publish\</_PublishTargetUrl>
+    <History>True|2026-04-06T23:41:07.1879746Z||;True|2026-04-07T00:06:45.4134525+01:00||;True|2026-03-29T22:48:45.6027474+01:00||;True|2026-03-29T21:15:38.5289219+01:00||;True|2026-03-28T19:38:17.6457065+01:00||;True|2026-03-28T18:57:56.3923839+01:00||;True|2026-03-27T22:51:58.5488567+01:00||;True|2026-03-27T21:22:09.6171825+01:00||;True|2026-03-27T20:47:40.6098893+01:00||;True|2026-03-27T17:09:08.7982246+01:00||;True|2026-03-27T16:06:25.6916070+01:00||;True|2026-03-10T18:39:24.1909275+01:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

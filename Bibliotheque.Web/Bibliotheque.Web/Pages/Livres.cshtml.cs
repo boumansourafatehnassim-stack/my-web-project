@@ -1,10 +1,10 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
-using Bibliotheque.Web.Models;
+using Bibliotheque.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Bibliotheque.Web.Pages
+namespace Bibliotheque.Api.Pages
 {
     public class LivresModel : PageModel
     {

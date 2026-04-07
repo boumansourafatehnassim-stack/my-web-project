@@ -5,10 +5,6 @@
       {
         "Path": "Bibliotheque.Api\\Bibliotheque.Api.csproj",
         "Action": "Start"
-      },
-      {
-        "Path": "Bibliotheque.Web\\Bibliotheque.Web\\Bibliotheque.Web.csproj",
-        "Action": "Start"
       }
     ]
   }

@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Bibliotheque.Web.Pages
+namespace Bibliotheque.Api.Pages
 {
     public class ModifierLivreModel : PageModel
     {

@@ -1,4 +1,4 @@
-﻿namespace Bibliotheque.Web.Models
+﻿namespace Bibliotheque.Api.Models
 {
     public class PagedResult<T>
     {

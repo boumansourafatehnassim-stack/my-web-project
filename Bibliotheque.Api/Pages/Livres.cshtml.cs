@@ -1,0 +1,138 @@
+﻿using System.Net.Http.Headers;
+using System.Text.Json;
+using Bibliotheque.Api.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheque.Api.Pages
+{
+    public class LivresModel : PageModel
+    {
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _config;
+
+        public LivresModel(IHttpClientFactory httpClientFactory, IConfiguration config)
+        {
+            _httpClientFactory = httpClientFactory;
+            _config = config;
+        }
+
+        public PagedResult<LivreDto> LivresPaged { get; set; } = new();
+        public string? Error { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? Search { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? Theme { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int PageNumber { get; set; } = 1;
+
+        [BindProperty(SupportsGet = true)]
+        public int PageSize { get; set; } = 20;
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            try
+            {
+                var apiBase = $"{Request.Scheme}://{Request.Host}";
+                var client = _httpClientFactory.CreateClient();
+
+                var jwt = HttpContext.Session.GetString("jwt");
+                if (!string.IsNullOrEmpty(jwt))
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+                var url = $"{apiBase}/api/Livres?page={PageNumber}&pageSize={PageSize}";
+
+                if (!string.IsNullOrWhiteSpace(Search))
+                    url += $"&recherche={Uri.EscapeDataString(Search.Trim())}";
+
+                if (!string.IsNullOrWhiteSpace(Theme))
+                    url += $"&theme={Uri.EscapeDataString(Theme.Trim())}";
+
+                var resp = await client.GetAsync(url);
+                var json = await resp.Content.ReadAsStringAsync();
+
+                if (!resp.IsSuccessStatusCode)
+                {
+                    Error = $"Erreur API: {resp.StatusCode} | {json}";
+                    return Page();
+                }
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                LivresPaged = JsonSerializer.Deserialize<PagedResult<LivreDto>>(json, options) ?? new PagedResult<LivreDto>();
+
+                if (LivresPaged.Page <= 0)
+                    LivresPaged.Page = PageNumber;
+
+                if (LivresPaged.PageSize <= 0)
+                    LivresPaged.PageSize = PageSize;
+
+                if (LivresPaged.TotalCount > 0 && LivresPaged.TotalPages <= 0)
+                    LivresPaged.TotalPages = (int)Math.Ceiling((double)LivresPaged.TotalCount / LivresPaged.PageSize);
+
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                Error = "Erreur: " + ex.Message;
+                return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            try
+            {
+                var role = HttpContext.Session.GetString("role");
+                if (role != "BIBLIOTHECAIRE" && role != "ADMIN")
+                    return RedirectToPage("/Livres");
+
+                var jwt = HttpContext.Session.GetString("jwt");
+                if (string.IsNullOrEmpty(jwt))
+                    return RedirectToPage("/Login");
+
+                var apiBase = $"{Request.Scheme}://{Request.Host}";
+                var client = _httpClientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+
+                var resp = await client.DeleteAsync($"{apiBase}/api/Livres/{id}");
+
+                if (!resp.IsSuccessStatusCode)
+                {
+                    var body = await resp.Content.ReadAsStringAsync();
+                    Error = $"Erreur suppression: {resp.StatusCode} | {body}";
+                    await OnGetAsync();
+                    return Page();
+                }
+
+                return RedirectToPage("/Livres");
+            }
+            catch (Exception ex)
+            {
+                Error = "Erreur suppression: " + ex.Message;
+                await OnGetAsync();
+                return Page();
+            }
+        }
+
+        public class LivreDto
+        {
+            public int Id { get; set; }
+            public string Titre { get; set; } = "";
+            public string Auteur { get; set; } = "";
+            public string? Theme { get; set; }
+            public int? AnneePublication { get; set; }
+            public string? Langue { get; set; }
+            public string? AdresseBibliogr { get; set; }
+            public bool IsDeleted { get; set; }
+            public int NombreExemplaires { get; set; }
+            public int NombreDisponibles { get; set; }
+        }
+    }
+}

@@ -4,7 +4,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Bibliotheque.Web.Pages
+namespace Bibliotheque.Api.Pages
 {
     public class AjouterLivreModel : PageModel
     {

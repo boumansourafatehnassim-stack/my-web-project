@@ -1,0 +1,186 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Accueil";
+}
+
+<div class="page-section">
+    <div class="dashboard-hero">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1 class="mb-2">Plateforme Bibliothèque</h1>
+                <p class="mb-0 text-white">
+                    Gestion du catalogue, des demandes et des emprunts au sein de la bibliothèque ENSTICP.
+                </p>
+            </div>
+
+            <div class="text-md-end">
+                <span class="badge rounded-pill bg-light text-dark px-3 py-2">
+                    ENSTICP
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 page-section">
+    <div class="col-md-3">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">👥</div>
+                <div>
+                    <h5 class="mb-1">Utilisateurs</h5>
+                    <div class="text-muted">Total inscrits</div>
+                </div>
+            </div>
+            <h2 class="mb-0">@Model.Stats.TotalUsers</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">✅</div>
+                <div>
+                    <h5 class="mb-1">Actifs</h5>
+                    <div class="text-muted">Comptes actifs</div>
+                </div>
+            </div>
+            <h2 class="mb-0">@Model.Stats.ActiveUsers</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">📚</div>
+                <div>
+                    <h5 class="mb-1">Livres</h5>
+                    <div class="text-muted">Ouvrages disponibles</div>
+                </div>
+            </div>
+            <h2 class="mb-0">@Model.Stats.TotalLivres</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">📝</div>
+                <div>
+                    <h5 class="mb-1">Demandes</h5>
+                    <div class="text-muted">Total demandes</div>
+                </div>
+            </div>
+            <h2 class="mb-0">@Model.Stats.TotalDemandes</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 page-section">
+    <div class="col-md-3">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">⏳</div>
+                <div>
+                    <h5 class="mb-1">En attente</h5>
+                    <div class="text-muted">Demandes en attente</div>
+                </div>
+            </div>
+            <h2 class="mb-0">@Model.Stats.DemandesEnAttente</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">📖</div>
+                <div>
+                    <h5 class="mb-1">Emprunts</h5>
+                    <div class="text-muted">Total emprunts</div>
+                </div>
+            </div>
+            <h2 class="mb-0">@Model.Stats.TotalEmprunts</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">🔄</div>
+                <div>
+                    <h5 class="mb-1">En cours</h5>
+                    <div class="text-muted">Emprunts en cours</div>
+                </div>
+            </div>
+            <h2 class="mb-0">@Model.Stats.EmpruntsEnCours</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">🔔</div>
+                <div>
+                    <h5 class="mb-1">Notifications</h5>
+                    <div class="text-muted">Total notifications</div>
+                </div>
+            </div>
+            <h2 class="mb-0">@Model.Stats.TotalNotifications</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">📚</div>
+                <div>
+                    <h5 class="mb-1">Livres</h5>
+                    <div class="text-muted">Consulter le catalogue des ouvrages</div>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <a class="btn btn-primary w-100" asp-page="/Livres">Ouvrir</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">📝</div>
+                <div>
+                    <h5 class="mb-1">Demandes</h5>
+                    <div class="text-muted">Suivre, valider ou refuser les demandes</div>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <a class="btn btn-primary w-100" asp-page="/Demandes">Ouvrir</a>
+            </div>
+            <a asp-page="/CarteEtudiant" class="btn btn-outline-primary">
+                Voir ma carte
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="feature-icon me-3">🔔</div>
+                <div>
+                    <h5 class="mb-1">Notifications</h5>
+                    <div class="text-muted">Consulter les alertes et les messages</div>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <a class="btn btn-primary w-100" asp-page="/Notifications">Ouvrir</a>
+            </div>
+
+        </div>
+    </div>
+</div>
